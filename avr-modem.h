@@ -10,18 +10,28 @@
 // high frequency for 1
 #define HIGH_FREQ          (7350)     // Hz
 // buffer size. Must be a power of 2 and greater than 8 {8, 16, 32, 64, 128,...}
-#define RX_BUF_SIZE        (32)       // Byte
+#define RX_BUF_SIZE        (16)       // Byte
 
 class AvrModem {
 public:
 	AvrModem();
-	virtual ~AvrModem();
+	~AvrModem();
 	static AvrModem *activeObject;
-	virtual int listen(void (*onReceive)(uint8_t *));
-	virtual size_t write(uint8_t *message, size_t size);
+	virtual void listen(void (*onReceive)(char*));
+	virtual void write(char *message, size_t size);
 	void modulate(void);
 	void demodulate(void);
-	void recv(void);
+	void receive(void);
+private:
+	uint8_t     _receiveStatus;
+	char        _receiveBits;							// every bit of data will be stored in this byte
+	uint8_t     _receiveBufferHead;
+	uint8_t     _receiveBufferTail;
+	char        _receiveBuffer[RX_BUF_SIZE];
+	uint16_t    _lastTCNT;
+	uint16_t    _lowCount;
+	uint16_t    _highCount;
+	void        (*_onReceive)(char*);
 };
 
 #endif /* AVR_MODEM_H_ */
